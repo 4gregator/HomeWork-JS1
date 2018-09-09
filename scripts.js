@@ -1,8 +1,8 @@
 // 1) Ответ: Постфиксная форма отличается от префиксной тем, что возвращает старое значение, бывшее до увеличения;
 
- // 2) Ответ: x = 5;
+// 2) Ответ: x = 5;
 
- // 3)
+// 3)
 let a, b;
 
 function random(min, max) {
@@ -13,13 +13,14 @@ function random(min, max) {
 
 a = random(-15, 15);
 b = random(-15, 15);
- if (a >= 0 && b >= 0) {
+
+if (a >= 0 && b >= 0) {
 	console.log(a - b);
 } else if (a < 0 && b < 0) {
 	console.log(a * b);
 } else console.log(a + b);
 
- // 4)
+// 4)
 a = random(0, 15);
 switch(a) {
 	case 0:
@@ -56,7 +57,7 @@ switch(a) {
 		console.log(15);
 }
 
- // 5)
+// 5)
 function sum(x, y) {
 	return x + y;
 }
@@ -73,7 +74,7 @@ function dvs(x, y) {
 	return x / y;
 }
 
- // 6)
+// 6)
 function mathOperation(arg1, arg2, operation) {
 	let result;
 	switch(operation) {
@@ -91,9 +92,10 @@ function mathOperation(arg1, arg2, operation) {
 	}
 	return result;
 }
- // 7) null числом не является, поэтому не может быть ни больше, ни меньше, ни равно нулю
 
- // 8)
+// 7) null числом не является, поэтому не может быть ни больше, ни меньше, ни равно нулю
+
+// 8)
 function power(val, pow) {
 	if (pow == 0) {
 		if (val == 0) return NaN;
