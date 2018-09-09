@@ -1,17 +1,17 @@
-// 1) Ответ: {
-//	Постфиксная форма отличается от префиксной тем, что возвращает старое значение, бывшее до увеличения.
-//};
+// 1) Ответ: Постфиксная форма отличается от префиксной тем, что возвращает старое значение, бывшее до увеличения;
 
  // 2) Ответ: x = 5;
 
  // 3)
 let a, b;
- function random(min, max) {
+
+function random(min, max) {
 	let rand = min + Math.random() * (max + 1 - min);
 	rand = Math.floor(rand);
 	return rand;
 }
- a = random(-15, 15);
+
+a = random(-15, 15);
 b = random(-15, 15);
  if (a >= 0 && b >= 0) {
 	console.log(a - b);
@@ -60,13 +60,16 @@ switch(a) {
 function sum(x, y) {
 	return x + y;
 }
- function sub(x, y) {
+
+function sub(x, y) {
 	return x - y;
 }
- function mlt(x, y) {
+
+function mlt(x, y) {
 	return x * y;
 }
- function dvs(x, y) {
+
+function dvs(x, y) {
 	return x / y;
 }
 
