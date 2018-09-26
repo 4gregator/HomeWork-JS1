@@ -1,56 +1,200 @@
-let basket = [
-	{
-		id: 5468,
-		productName: "Кирпич, м3",
-		quantity: 15,
-		price: 45
-	}, {
-		id: 7124,
-		productName: "Брус 40х40, м3",
-		quantity: 4,
-		price: 128
-	}, {
-		id: 6781,
-		productName: "Книга 'строительство для чайников', шт",
-		quantity: 1,
-		price: 14.2
-	}
-];
-
-// предположим, что кнопке "купить" присвоен класс "buy"
-let addToBasket = document.getElementByClassName("buy");
-
-addToBasket.onclick = function() {
-	// проверяем, есть ли уже такой товар в корзине
-	let checkID = this.id,
-		product = this.name,
-		c = 0;
-	for (let i = 0; i < basket.length; i++) {
-		if (basket[i].id == checkID) {
-			basket[i].quantity++;
-		} else c++;
-	}
-	if (c == basket.length) {
-		basket.push({
-			id: 0,
-			productName: 0,
-			quantity: 0,
-			price: 0
-		});
-		basket[basket.length - 1].id = checkID;
-		basket[basket.length - 1].productName = product;
-		basket[basket.length - 1].quantity = 1;
-		basket[basket.length - 1].price = 100; //цена видимо должна браться из базы
-	}
-	countBasketPrice(basket);
+function random(min, max){
+	return Math.floor(Math.random() * (max - min)) + min;
 };
 
-function countBasketPrice(basket) {
-	let sum = 0;
+var game = {
+	size: 20,
+	snake: [],
+	food: {},
+	wall: {},
+	score: 0,
+	direction: {
+		row: -1,
+		col: 0
+	},
+	createBoard: function(){
+		console.log('createBoard');
+		var table = document.createElement('table'),
+			totalScore = document.createElement('div');
 
-	for (let i = 0; i < basket.length; i++) {
-		sum += basket[i].quantity * basket[i].price;
+		table.classList.add('game-table');
+		totalScore.id = 'score';
+		totalScore.innerHTML = "Ваш счёт: " + this.score;
+
+		for ( var i = 0; i < this.size; i++ ) {
+			var tr = document.createElement('tr');
+
+			for ( var j = 0; j < this.size; j++ ) {
+				td = document.createElement('td');
+				td.classList.add('game-table-cell');
+				td.setAttribute('id', 'cell-' + i + '-' + j);
+				tr.appendChild(td);
+			}
+			table.appendChild(tr);
+		} 
+
+		document.getElementById('snake-field').appendChild(table);
+		document.body.appendChild(totalScore);
+	},
+	createSnake: function(){
+		this.snake.push({row: 10, col: 10});
+		this.snake.push({row: 11, col: 10});
+	},
+	render: function(){
+		var elements = document.getElementsByTagName('td');
+
+		document.getElementById('score').innerHTML = "Ваш счёт: " + this.score;
+
+		for ( var i = 0; i < elements.length; i++ ) {
+			elements[i].classList.remove('snake-unit');
+			elements[i].classList.remove('food-unit');
+			elements[i].classList.remove('wall-unit');
+		}
+
+		for ( var i = 0; i < this.snake.length; i++ ) {
+			var cell = this.snake[i];
+			var id = 'cell-' + cell.row + '-' + cell.col;
+			document.getElementById(id).classList.add('snake-unit');
+		}
+
+		if ( this.food.row && this.food.col ) {
+			var id = 'cell-' + this.food.row + '-' + this.food.col;
+			document.getElementById(id).classList.add('food-unit');
+		}
+
+		if ( this.wall.row && this.wall.col ) {
+			var id = 'cell-' + this.wall.row + '-' + this.wall.col;
+			document.getElementById(id).classList.add('wall-unit');
+			document.getElementById(id).innerHTML = 'X';
+		}
+	},
+	isSnakeCell: function(row, col){
+		for ( var i = 0; i < this.snake.length; i++ ) {
+			var cell = this.snake[i];
+			if ( cell.row == row && cell.col == col ) {
+				return true;
+			}
+		}
+
+		return false;
+	},
+	createFood: function(){
+		var pool = [];
+		for ( var i = 0; i < this.size; i++ ) {
+			for ( var j = 0; j < this.size; j++ ) {
+				if ( !this.isSnakeCell(i, j) ) {
+					pool.push({row: i, col: j});
+				}
+			}
+		} 
+
+		var index = random(0, pool.length);
+		this.food = pool[index];
+	},
+	createWall: function(){
+		var pool = [];
+		for ( var i = 0; i < this.size; i++ ) {
+			for ( var j = 0; j < this.size; j++ ) {
+				if ( !this.isSnakeCell(i, j) && this.food.row != i && this.food.col != j ) {
+					pool.push({row: i, col: j});
+				}
+			}
+		} 
+
+		var index = random(0, pool.length);
+		this.wall = pool[index];
+	},
+	setEvents: function(){
+		this.intervalId = setInterval(this.move.bind(this), 500);
+		document.addEventListener('keydown', this.changeDirection.bind(this));
+	},
+	changeDirection: function(e){
+		switch ( e.keyCode ) {
+			case 37:
+				//влево
+				this.direction = {
+					row: 0,
+					col : -1
+				};
+				break;
+			case 38:
+			 	//вверх
+				this.direction = {
+					row: -1,
+					col : 0
+				};
+			 	break;
+			case 39:
+			 	//вправо
+				this.direction = {
+					row: 0,
+					col : 1
+				};
+			 	break;
+			case 40:
+				//вниз
+				this.direction = {
+					row: 1,
+					col : 0
+				};
+				break;
+			default:
+				break;
+		}
+	},
+	checkCell: function(row, col){
+		if ( this.isSnakeCell(row, col) || this.wall.row == row && this.wall.col == col) {
+			return false;
+		}
+
+		return true;
+	},
+	over: function(){
+		alert('Игра завершена');
+		clearInterval(this.intervalId);
+	},
+	move: function(){
+		// смотрим направление движения
+		// в зависимости от направления движения
+		// определить "голову змеи" и создаем новую голову
+		var row = this.snake[0].row + this.direction.row;
+		var col = this.snake[0].col + this.direction.col;
+
+		if (row == -1) row = 19;
+		else if (row == 20) row = 0;
+		if (col == -1) col = 19;
+		else if (col == 20) col = 0;
+
+		if ( !this.checkCell(row, col) ) {
+			return this.over();
+		}
+
+		// добавить элемент в начало змеи
+		this.snake.unshift({row: row, col: col});
+
+		// удаляем элемент из хвоста змеи - таким образом змея двигается
+		if ( !this.food || this.food.row != row || this.food.col != col ) {
+			// еды нет
+			this.snake.pop();
+		} else {
+			// еду съели
+			this.score++;
+			this.createFood();
+			this.createWall();
+		}
+
+		this.render();
+	},
+	run: function(){
+		this.createBoard();
+		this.createSnake();
+		this.createFood();
+		this.createWall();
+		this.render();
+		this.setEvents();
 	}
-
-	return sum;
 };
+
+window.addEventListener('load', function(){
+	game.run();
+});
